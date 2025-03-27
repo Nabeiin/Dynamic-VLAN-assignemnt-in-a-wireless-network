@@ -1,0 +1,138 @@
+CLI Configuration for Dynamic VLAN Assignment in a Wireless Network
+Below is the CLI configuration extracted and structured from the show running-config output. This includes VLAN segmentation, IP routing, DHCP relay, trunk and access ports, and Wireless LAN Controller (WLC) integration.
+________________________________________
+1. Enable IP Routing (Layer 3 Functionality)
+CoreSwitch(config)# ip routing
+________________________________________
+2. VLAN Configuration
+CoreSwitch(config)# vlan 10
+CoreSwitch(config-vlan)# name Management
+CoreSwitch(config-vlan)# exit
+
+CoreSwitch(config)# vlan 20
+CoreSwitch(config-vlan)# name HR_Department
+CoreSwitch(config-vlan)# exit
+
+CoreSwitch(config)# vlan 30
+CoreSwitch(config-vlan)# name Finance_Department
+CoreSwitch(config-vlan)# exit
+
+CoreSwitch(config)# vlan 99
+CoreSwitch(config-vlan)# name Infrastructure
+CoreSwitch(config-vlan)# exit
+________________________________________
+3. VLAN Interface Configuration (SVIs)
+CoreSwitch(config)# interface Vlan10
+CoreSwitch(config-if)# ip address 192.168.10.1 255.255.255.0
+CoreSwitch(config-if)# ip helper-address 192.168.99.100
+CoreSwitch(config-if)# no shutdown
+CoreSwitch(config-if)# exit
+
+CoreSwitch(config)# interface Vlan20
+CoreSwitch(config-if)# ip address 192.168.20.1 255.255.255.0
+CoreSwitch(config-if)# ip helper-address 192.168.99.100
+CoreSwitch(config-if)# no shutdown
+CoreSwitch(config-if)# exit
+
+CoreSwitch(config)# interface Vlan30
+CoreSwitch(config-if)# ip address 192.168.30.1 255.255.255.0
+CoreSwitch(config-if)# ip helper-address 192.168.99.100
+CoreSwitch(config-if)# no shutdown
+CoreSwitch(config-if)# exit
+
+CoreSwitch(config)# interface Vlan99
+CoreSwitch(config-if)# ip address 192.168.99.3 255.255.255.0
+CoreSwitch(config-if)# ip helper-address 192.168.99.100
+CoreSwitch(config-if)# no shutdown
+CoreSwitch(config-if)# exit
+________________________________________
+4. Default Gateway and Static Route
+CoreSwitch(config)# ip default-gateway 192.168.99.1
+CoreSwitch(config)# ip route 0.0.0.0 0.0.0.0 192.168.99.1
+________________________________________
+5. Trunk Ports for VLAN Propagation
+CoreSwitch(config)# interface FastEthernet0/9
+CoreSwitch(config-if)# switchport trunk native vlan 99
+CoreSwitch(config-if)# switchport trunk allowed vlan 20,99
+CoreSwitch(config-if)# switchport mode trunk
+CoreSwitch(config-if)# exit
+
+CoreSwitch(config)# interface FastEthernet0/10
+CoreSwitch(config-if)# switchport trunk native vlan 99
+CoreSwitch(config-if)# switchport trunk allowed vlan 10,99
+CoreSwitch(config-if)# switchport trunk encapsulation dot1q
+CoreSwitch(config-if)# switchport mode trunk
+CoreSwitch(config-if)# exit
+
+CoreSwitch(config)# interface FastEthernet0/11
+CoreSwitch(config-if)# description Link_to_HR_Distribution_Switch
+CoreSwitch(config-if)# switchport trunk native vlan 99
+CoreSwitch(config-if)# switchport trunk allowed vlan 20,99
+CoreSwitch(config-if)# switchport trunk encapsulation dot1q
+CoreSwitch(config-if)# switchport mode trunk
+CoreSwitch(config-if)# exit
+
+CoreSwitch(config)# interface FastEthernet0/12
+CoreSwitch(config-if)# switchport trunk native vlan 99
+CoreSwitch(config-if)# switchport trunk allowed vlan 30,99
+CoreSwitch(config-if)# switchport trunk encapsulation dot1q
+CoreSwitch(config-if)# switchport mode trunk
+CoreSwitch(config-if)# exit
+
+CoreSwitch(config)# interface FastEthernet0/13
+CoreSwitch(config-if)# description Link_to_WLC
+CoreSwitch(config-if)# switchport trunk native vlan 99
+CoreSwitch(config-if)# switchport trunk allowed vlan 10,20,30,99
+CoreSwitch(config-if)# switchport trunk encapsulation dot1q
+CoreSwitch(config-if)# switchport mode access
+CoreSwitch(config-if)# exit
+
+CoreSwitch(config)# interface FastEthernet0/24
+CoreSwitch(config-if)# description Management_Port
+CoreSwitch(config-if)# switchport access vlan 99
+CoreSwitch(config-if)# switchport trunk native vlan 99
+CoreSwitch(config-if)# switchport trunk allowed vlan 10,20,30,99
+CoreSwitch(config-if)# switchport trunk encapsulation dot1q
+CoreSwitch(config-if)# switchport mode trunk
+CoreSwitch(config-if)# exit
+
+CoreSwitch(config)# interface GigabitEthernet0/1
+CoreSwitch(config-if)# description Link_to_Router
+CoreSwitch(config-if)# switchport trunk native vlan 99
+CoreSwitch(config-if)# switchport trunk allowed vlan 10,20,30,99
+CoreSwitch(config-if)# switchport trunk encapsulation dot1q
+CoreSwitch(config-if)# switchport mode trunk
+CoreSwitch(config-if)# exit
+________________________________________
+6. Access Ports for Key Devices
+CoreSwitch(config)# interface FastEthernet0/15
+CoreSwitch(config-if)# description DHCP_Server
+CoreSwitch(config-if)# switchport access vlan 99
+CoreSwitch(config-if)# switchport mode access
+CoreSwitch(config-if)# exit
+
+CoreSwitch(config)# interface FastEthernet0/16
+CoreSwitch(config-if)# description Admin_PC
+CoreSwitch(config-if)# switchport access vlan 99
+CoreSwitch(config-if)# switchport mode access
+CoreSwitch(config-if)# exit
+________________________________________
+7. Spanning Tree Configuration (Loop Prevention)
+CoreSwitch(config)# spanning-tree mode pvst
+________________________________________
+8. Save Configuration
+CoreSwitch# write memory
+________________________________________
+Summary of Configuration Steps
+Configuration	Purpose
+IP Routing Enabled	Allows inter-VLAN communication.
+VLAN Segmentation	Separates network into IT, HR, Finance, and Management.
+SVI Configuration	Assigns IP addresses and DHCP relay for VLANs.
+Trunk Port Setup	Connects switches and WLC with VLAN tagging.
+Access Port Setup	Assigns VLANs to key devices (Admin PC, DHCP).
+Spanning Tree (PVST)	Prevents loops in Layer 2.
+Default Gateway & Route	Provides external network connectivity.
+Save Configuration	Ensures settings persist after reboot.
+________________________________________
+This configuration ensures network efficiency, security, and seamless wireless VLAN assignment for IT, HR, and Finance departments. Let me know if you need any modifications or additional security enhancements! 
+
